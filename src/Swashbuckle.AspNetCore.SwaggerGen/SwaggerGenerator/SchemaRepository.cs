@@ -41,7 +41,15 @@ public class SchemaRepository(string documentName = null)
     {
         Schemas.Add(schemaId, schema);
 
-        return new OpenApiSchemaReference(schemaId);
+        return new OpenApiSchemaReference(schemaId)
+        {
+            Description = schema.Description,
+            Title = schema.Title,
+            Deprecated = schema.Deprecated,
+            ReadOnly = schema.ReadOnly,
+            Default = schema.Default,
+            Examples = schema.Examples,
+        };
     }
 
     public bool ReplaceSchemaId(Type schemaType, string replacementSchemaId)

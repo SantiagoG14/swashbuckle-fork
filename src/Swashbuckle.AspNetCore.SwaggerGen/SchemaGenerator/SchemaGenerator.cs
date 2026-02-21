@@ -172,17 +172,17 @@ public class SchemaGenerator(
     {
         var dataContract = GetDataContractFor(modelType);
 
+        // apply filters to all schemas types even 
+        // if its a reference open api schema, 
+        // let the writer handle validation
         var schema = _generatorOptions.UseOneOfForPolymorphism && IsBaseTypeWithKnownTypesDefined(dataContract, out var knownTypesDataContracts)
             ? GeneratePolymorphicSchema(schemaRepository, knownTypesDataContracts)
             : GenerateConcreteSchema(dataContract, schemaRepository);
 
-        if (schema is not OpenApiSchemaReference)
+        ApplyFilters(schema, modelType, schemaRepository);
+        if (Nullable.GetUnderlyingType(modelType) != null && schema is OpenApiSchema concrete)
         {
-            ApplyFilters(schema, modelType, schemaRepository);
-            if (Nullable.GetUnderlyingType(modelType) != null && schema is OpenApiSchema concrete)
-            {
-                SetNullable(concrete, true);
-            }
+            SetNullable(concrete, true);
         }
 
         return schema;
